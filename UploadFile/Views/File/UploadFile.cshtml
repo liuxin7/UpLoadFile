@@ -1,0 +1,138 @@
+﻿
+@{
+    ViewBag.Title = "UploadFile";
+}
+
+@*  加上这个 section Scripts  就可以在上面调用   JS 或 JQ的  事件
+    还有一种 方法 是放在  最下面   就是有点不习惯  放在下面 不需要引用 section Scripts
+    布局页  有一个这个 @Scripts    相当于站位了     子页面就可以 bajs 放到 head 里
+*@
+@section Scripts{
+    <script src="~/Scripts/file/file.js"></script>
+    <script type="text/javascript">
+        //  html5 FormData  上传 文件
+        $(".btnNotForm").click(function () {
+            var formData = new FormData();     // 初始化一个  FormData    来获取 上传文件
+            formData.append("files", $(".notFormFile")[0].files[0]);    //将文件塞入FormData
+            $.ajax({
+                url: "/File/SaveUpload",
+                type: "POST",
+                data: formData,
+                processData: false,  // 告诉jQuery不要去处理发送的数据
+                contentType: false,   // 告诉jQuery不要去设置Content-Type请求头
+                success: function (responseText) {
+                    alert(responseText);
+                }
+            });
+        });
+
+        // 分片上传   就是 上传大文件的是时候   每次只上传   一点
+
+        $(".btnFile").click(function () {
+            var upload = function (file, skip) {
+                var formData = new FormData();      //初始化一个   formdata  用来获取文件
+                var blockSize = 1000000;           //每块的大小
+                var nextSize = Math.min((skip + 1) * blockSize, file.size)    // 读取 每次上传文件的大小       Math.min(1,2)  返回最低的数字   返回1
+                // 返回选定元素 file.slice(1,2) 参数1 必写  已有的数组中返回选定的元素如果 end 未被规定，那么 slice() 方法会选取从 start 到数组结尾的所有元素。
+                var fileData = file.slice(skip * blockSize, nextSize)         // 截取 部分文件 块
+                formData.append("file", fileData);//将 部分文件 塞入FormData
+                formData.append("fileName", file.name);//保存文件名字
+
+                $.ajax({
+                    url: "/File/BlockUpload",
+                    type: "POST",
+                    data: formData,
+                    processData: false,  // 告诉jQuery不要去处理发送的数据
+                    contentType: false,   // 告诉jQuery不要去设置Content-Type请求头
+                    success: function (responseText) {
+                        $(".result").html("已经上传了" + (skip + 1) + "块文件");
+                        if (file.size <= nextSize) {//如果上传完成，则跳出继续上传
+                            alert("上传完成");
+                            return;
+                        }
+                        upload(file, ++skip);//递归调用   （文件，次数）  初始是0   每次+1
+                    }
+                });
+
+            };
+            var file = $("#file6")[0].files[0];
+            upload(file, 0);
+        });
+
+        function upload(file, skip) { };
+        // 与  下面的 的 函数 调用   没什么区别    具体就GG 了
+        var upload = function (file, skip) { };
+
+    </script>
+}
+
+
+<h2>文件上传</h2>
+
+<p>利用表单 上传 文件   action="/File/SaveFile"</p>
+
+<form action="/File/SaveFile" method="post" enctype="multipart/form-data">
+    <input type="file" class="file1" name="file1" />
+    <button type="submit" class="but1">上传</button>
+</form>
+
+<br />
+<br />
+
+<p>利用FormData  上传   html 5  的标签</p>
+<input id="fileinfo" type="file" class="notFormFile" />
+<button type="button" class="btnNotForm">FromData   HTML 标签  上传</button>
+
+<br />
+<br />
+
+
+<p> 分片上传   有些大文件  一次性上传不了 可以 一点一点 上传  multiple 可以上传 多个 文件</p>
+
+<input type="file" id="file6" multiple>
+<button type="button" class="btnFile">分片上传</button>
+<div class="result"></div>
+
+
+<br />
+<br />
+
+<p>   使用  html 5 拖拽  粘贴上传 </p>
+
+<textarea class="divFile7" style="min-width:800px;height:150px" placeholder="请将文件拖拽或直接粘贴到这里"></textarea>
+
+
+<br />
+<br />
+
+<p> 百度的WebUploader插件  上传    它的优势：稳定、兼容性好（有flash切换，所以支持IE）、功能多、并发上传、断点续传  </p>
+
+<div id="picker">选择文件</div>
+<button id="ctlBtn" class="btn btn-default">开始上传</button>
+
+
+
+
+
+
+
+
+@*利用  jq.from 插件  上传文件    通过 ajaxForm 方法   控制器的 方法是一样的   *@
+
+@*<form id="form2" action="/File/SaveFile2" method="post" enctype="multipart/form-data">
+        <input type="file" class="file1" name="file1" />
+        <button type="submit" class="but1">上传1</button>
+        <button type="button" class="but2">上传2</button>
+    </form>
+
+    $(function () {
+        $('#form2').ajaxForm({
+            success: function (responseText) {
+                alert(responseText);
+            }
+        });
+    });*@
+
+
+
+
