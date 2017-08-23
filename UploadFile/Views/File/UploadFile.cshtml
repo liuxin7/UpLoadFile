@@ -8,6 +8,12 @@
     布局页  有一个这个 @Scripts    相当于站位了     子页面就可以 bajs 放到 head 里
 *@
 @section Scripts{
+
+    @*引用的 webuploader  js*@
+    <link href="~/Scripts/webuploader/webuploader.css" rel="stylesheet" />
+    <script src="~/Scripts/webuploader/webuploader.js"></script>
+
+    @*粘贴   拖拽    webuploader    js*@
     <script src="~/Scripts/file/file.js"></script>
     <script type="text/javascript">
         //  html5 FormData  上传 文件
@@ -45,9 +51,11 @@
                     processData: false,  // 告诉jQuery不要去处理发送的数据
                     contentType: false,   // 告诉jQuery不要去设置Content-Type请求头
                     success: function (responseText) {
-                        $(".result").html("已经上传了" + (skip + 1) + "块文件");
+                        //$(".result").html("已经上传了" + (skip + 1) + "块文件");
+                        $(".progress-bar").css('width', skip * 100 + '%');
                         if (file.size <= nextSize) {//如果上传完成，则跳出继续上传
                             alert("上传完成");
+                            $("#divPro").hide();  // 隐藏 进度条
                             return;
                         }
                         upload(file, ++skip);//递归调用   （文件，次数）  初始是0   每次+1
@@ -57,12 +65,12 @@
             };
             var file = $("#file6")[0].files[0];
             upload(file, 0);
+            $("#divPro").show();  // 显示 进度条
         });
 
         function upload(file, skip) { };
         // 与  下面的 的 函数 调用   没什么区别    具体就GG 了
         var upload = function (file, skip) { };
-
     </script>
 }
 
@@ -91,7 +99,13 @@
 
 <input type="file" id="file6" multiple>
 <button type="button" class="btnFile">分片上传</button>
-<div class="result"></div>
+@*<div class="result"></div>*@
+@*进度条*@
+<div class="progress progress-striped active" id="divPro" style="display:none;">
+    <div class="progress-bar" role="progressbar" style="width: 0%">
+    </div>
+</div>
+
 
 
 <br />
@@ -107,8 +121,28 @@
 
 <p> 百度的WebUploader插件  上传    它的优势：稳定、兼容性好（有flash切换，所以支持IE）、功能多、并发上传、断点续传  </p>
 
-<div id="picker">选择文件</div>
-<button id="ctlBtn" class="btn btn-default">开始上传</button>
+<div id="uploader" class="wu-example">
+    <div id="thelist" class="uploader-list">
+        <!--用来存放文件信息-->
+    </div>
+    <div class="btns">
+        <div id="picker">选择文件</div>
+        <button id="ctlBtn" class="btn btn-default">开始上传</button>
+    </div>
+</div>
+
+<br />
+<br />
+
+<p>  webuploader   上传 图片    </p>
+<div id="uploader-demo">
+    <!--用来存放item-->
+    <div id="fileList" class="uploader-list"></div>
+    <div id="filePicker">选择图片</div>
+
+
+</div>
+
 
 
 

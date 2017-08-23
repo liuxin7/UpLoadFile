@@ -84,6 +84,23 @@ namespace UploadFile.Controllers
         }
 
         /// <summary>
+        ///  如果 每次 不是按1片 传    用  2+ 以上的    
+        /// </summary>
+        public string DoubleFlie()
+        {
+            string str = string.Empty;
+            var chunk = Request.Form["chunk"];  　// 当前的 片数
+            var path = Server.MapPath("~/App_Data/") + Path.GetFileNameWithoutExtension(Request.Files[0].FileName);  //   获取路径
+            if (!Directory.Exists(path))  //   判断路径目录  是否存在   不存在就创建
+                Directory.CreateDirectory(path);
+            //  
+            var filePath = path + "/" + chunk;
+
+            return str;
+        }
+
+
+        /// <summary>
         ///  文件 拖拽
         /// </summary>
         /// <returns></returns>
